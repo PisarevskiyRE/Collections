@@ -1,5 +1,5 @@
 
-sealed trait CreditCard {
+sealed trait CreditCard extends Any{
   import CreditCard._
 
   def number: String
@@ -23,20 +23,20 @@ sealed trait CreditCard {
     }
 }
 
-object CreditCard extends (String => CreditCard){
+object CreditCard extends (String => CreditCard) with (() => CreditCard){
 
-  object Invalid{
+  object Invalid {
     private[CreditCard] def apply(number: String): Invalid =
       new Invalid(number)
   }
-  final case class Invalid private (number: String) extends CreditCard
+  final case class Invalid private (number: String) extends AnyVal with CreditCard
 
 
   object Valid{
     private[CreditCard] def apply(number: String): Valid =
       new Valid(number)
   }
-  final case class   Valid private (number: String) extends CreditCard
+  final case class   Valid private (number: String) extends AnyVal with CreditCard
 
   def apply(number: String): CreditCard =
     if (isValid(number))
@@ -93,6 +93,31 @@ object CreditCard extends (String => CreditCard){
     Valid(generateNumber)
 
   private def generateNumber(): String = {
-    "123123"
+
+    val payload = {
+      import scala.util.Random
+
+      val min: Int = MinimumLength - ChekDigitLeng
+      val max: Int = MaximumLength - ChekDigitLeng
+
+      val length: Int = min + Random.nextInt(max - min + 1)
+
+      def randomDigit: Int =
+        Random.nextInt(10)
+
+      (1 to length)
+        .map(_ => randomDigit)
+        .mkString
+    }
+
+    val checkDigit: Int =
+      (10 - (luhn(payload) % 10)) % 10
+
+    val number = "1234567812345670"
+    if (isValid(number))
+      number
+    else
+      sys.error(s"Bug: generated an invalid number: $number")
+
   }
 }
