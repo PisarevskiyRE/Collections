@@ -10,8 +10,26 @@ lazy val root = (project in file("."))
 ThisBuild / triggeredMessage  := Watched.clearWhenTriggered
 
 
+//resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % "test"
+
+//libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % "test"
+//libraryDependencies += "org.pegdown"  %   "pegdown" % "1.6.0" % "test"
 
 
-testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
+libraryDependencies ++=
+  Seq(
+    "org.scalatest" %%  "scalatest" %  "3.2.18" % "test", // http://www.scalatest.org/
+    "org.scalacheck" %% "scalacheck" % "1.16.0" % "test",
+    "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
+  )
+
+
+//testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oSD")
+//testOptions in Test +=  Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
+
+testOptions in Test ++= Seq(
+  Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports-xml"),
+  Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports-html"),
+  Tests.Argument(TestFrameworks.ScalaTest, "-oDWF")
+)
