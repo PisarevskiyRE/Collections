@@ -1,6 +1,6 @@
 import scalariform.formatter.preferences._
 
-ThisBuild / scalariformPreferences :=
+scalariformPreferences :=
   scalariformPreferences.value
     .setPreference(AlignArguments, true)
     .setPreference(AlignSingleLineCaseStatements, true)

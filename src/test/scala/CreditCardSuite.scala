@@ -1,9 +1,7 @@
-import org.scalatest.funsuite._
-import org.scalatest.matchers.should.Matchers
 import org.scalatest._
 import org.scalatest.prop._
 
-class CreditCardSuite extends AnyFunSuite with Matchers {
+class CreditCardSuite extends FunSuite with Matchers {
 
   test("Creating a card without passing any number should generate a valid credit card") {
     CreditCard().isValid shouldBe true
@@ -65,12 +63,12 @@ class CreditCardSuite extends AnyFunSuite with Matchers {
         "6387887062135843"
       ).map(CreditCard)
 
-    all(fakeValidCards.map(_.isValid)) shouldBe(true)
+    all(fakeValidCards.map(_.isValid)) shouldBe (true)
   }
 
   test("10k generate numbers should all be valid") {
     val fakeNumber = 1 to 10000 map (_ => CreditCard())
-    all(fakeNumber.map(_.isValid)) shouldBe(true)
+    all(fakeNumber.map(_.isValid)) shouldBe (true)
   }
 
 }
