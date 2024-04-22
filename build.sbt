@@ -7,15 +7,8 @@ lazy val root = (project in file("."))
     name := "Collections"
   )
 
-ThisBuild / triggeredMessage  := Watched.clearWhenTriggered
+triggeredMessage := Watched.clearWhenTriggered
 
-scalacOptions ++= Seq(
-  "-feature",
-  "-deprecation",
-  "-language:implicitConversions",
-  "-language:higherKinds",
-  //"-Ypartial-unification"
-)
 
 
 resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
@@ -28,12 +21,12 @@ libraryDependencies ++=
     "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
   )
 
+
 testOptions in Test ++=
   Seq(
     Tests.Argument(TestFrameworks.ScalaTest, "-oSD"),
     Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
   )
-
 
 addCommandAlias("testc", ";clean;coverage;test;coverageReport")
 

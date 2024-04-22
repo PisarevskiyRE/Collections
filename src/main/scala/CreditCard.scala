@@ -1,5 +1,5 @@
 
-sealed trait CreditCard extends Any {
+sealed trait CreditCard extends Any with Product with Serializable {
   import CreditCard._
 
   def number: String

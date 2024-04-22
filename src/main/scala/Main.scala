@@ -1,16 +1,17 @@
+object Main {
+  def main(args: Array[String]): Unit = {
+    println("-" * 50)
 
-object Main extends App{
-  println("-"*50)
+    code(args)
 
-  code(args)
-
-  println("-"*50)
+    println("-" * 50)
+  }
 
   private def code(args: Array[String]): Unit = {
     args
-      .headOption             // Option[String]
-      .map(CreditCard.apply)  // Option[CreditCard]
-      .map(println)           // Option[Unit]
+      .headOption // Option[String]
+      .map(CreditCard) // Option[CreditCard]
+      .map(println) // Option[Unit]
       .getOrElse(runDemo)
   }
 
@@ -22,27 +23,22 @@ object Main extends App{
     println(validCard.number)
     println(validCard.isValid)
 
-
     println()
 
     val invalidCard: CreditCard =
-      CreditCard("1234567812345678")
+      CreditCard("1234567812345678") // change the check digit (the last digit) to zero to make it a valid card
 
     println(invalidCard)
     println(invalidCard.number)
     println(invalidCard.isValid)
 
-
-
     println()
 
-    val fakeNumber = 1 to 10000 map (_ => CreditCard())
+    val fakeCards = 1 to 10000 map (_ => CreditCard())
 
-    println(fakeNumber.forall( _.isValid))
+    println(fakeCards.forall(_.isValid))
 
-    println()
-
-    val moreFakeNumbers =
+    val moreFakeCards =
       Set(
         "0604326448044080",
         "30166725723574",
@@ -76,18 +72,19 @@ object Main extends App{
         "6011555484292906",
         "6370424233370023",
         "6380761773419647",
-        "6387887062135843",
+        "6387887062135843"
       ).map(CreditCard)
 
     val (valid, invalid) =
-      moreFakeNumbers.partition( _.isValid)
+      moreFakeCards.partition(_.isValid)
 
     if (invalid.nonEmpty) {
       println()
       invalid foreach println
     }
-    println()
-    println("You can also pass in the credit card number as a command line argument like this: run 6011278148379643")
 
+    println()
+
+    println("You can also pass in the credit card number as a command line arugment like this: run 5893505008915446")
   }
 }

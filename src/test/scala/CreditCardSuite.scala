@@ -1,7 +1,9 @@
 import org.scalatest._
 import org.scalatest.prop._
 
-class CreditCardSuite extends FunSuite with Matchers {
+import org.scalacheck._
+
+class CreditCardSuite extends FunSuite with Matchers with PropertyChecks {
 
   test("Creating a card without passing any number should generate a valid credit card") {
     CreditCard().isValid shouldBe true
