@@ -9,25 +9,25 @@ lazy val root = (project in file("."))
 
 triggeredMessage := Watched.clearWhenTriggered
 
+initialCommands in console := "import homegrown.collections._"
 
-
-resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
+//resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 
 
 libraryDependencies ++=
   Seq(
     "org.scalatest" %%  "scalatest" %  "3.0.5" % "test", // http://www.scalatest.org/
-    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
-    "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
+//    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
+//    "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
   )
 
 
-testOptions in Test ++=
-  Seq(
-    Tests.Argument(TestFrameworks.ScalaTest, "-oSD"),
-    Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
-  )
+//testOptions in Test ++=
+//  Seq(
+//    Tests.Argument(TestFrameworks.ScalaTest, "-oSD"),
+//    Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
+//  )
 
 addCommandAlias("testc", ";clean;coverage;test;coverageReport")
 
-coverageExcludedPackages := "Main"
+//coverageExcludedPackages := "Main"
