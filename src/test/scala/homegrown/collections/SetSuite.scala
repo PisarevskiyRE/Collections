@@ -1,7 +1,7 @@
 import homegrown.collections._
 import org.scalatest._
 
-object SetSuite extends FunSuite with Matchers {
+class SetSuite extends FunSuite with Matchers {
 
   test("apply on an empty Set should yield false") {
     Set.empty(randomString) shouldBe false
