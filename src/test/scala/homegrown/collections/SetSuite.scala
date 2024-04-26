@@ -25,10 +25,16 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val set = Set.empty.add(first).add(second)
+    val set = OldSet.empty.add(first).add(second)
 
     set(first) shouldBe true
     set(second) shouldBe true
+  }
+
+  test("remove on an empty Set should yield an empty Set") {
+    val element = randomString
+    val stillEmpty = Set.empty.remove(element)
+    stillEmpty(element) shouldBe false
   }
 
   test("remove on a non empty Set should yield a new Set without the element") {
@@ -73,7 +79,7 @@ class SetSuite extends FunSuite with Matchers {
   }
 
   test("union on empty Set should yield an empty Set") {
-    Set.empty.union(Set.empty)(randomString) shouldBe false
+    OldSet.empty.union(OldSet.empty)(randomString) shouldBe false
   }
 
   test("union on a non empty Set with an empty set should yield the original Set untouched") {
@@ -82,7 +88,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty
+    val emptySet = OldSet.empty
     val nonEmptySet = emptySet.add(first).add(second)
 
     emptySet.union(nonEmptySet)(first) shouldBe true
@@ -98,8 +104,8 @@ class SetSuite extends FunSuite with Matchers {
     val c = randomString
     val d = randomString
 
-    val left = Set.empty.add(a).add(b)
-    val right = Set.empty.add(c).add(d)
+    val left = OldSet.empty.add(a).add(b)
+    val right = OldSet.empty.add(c).add(d)
 
     val leftUnion = left.union(right)
 
@@ -117,7 +123,7 @@ class SetSuite extends FunSuite with Matchers {
   }
 
   test("intersection on empty Set should yield an empty Set") {
-    Set.empty.intersection(Set.empty)(randomString) shouldBe false
+    OldSet.empty.intersection(OldSet.empty)(randomString) shouldBe false
   }
 
   test("intersection on a non empty Set with an empty Set should yield an empty Set") {
@@ -126,7 +132,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty
+    val emptySet = OldSet.empty
     val nonEmptySet = emptySet.add(first).add(second)
 
     emptySet.intersection(nonEmptySet)(first) shouldBe false
@@ -142,8 +148,8 @@ class SetSuite extends FunSuite with Matchers {
     val c = randomString
     val d = randomString
 
-    val left = Set.empty.add(a).add(b).add(c)
-    val right = Set.empty.add(b).add(c).add(d)
+    val left = OldSet.empty.add(a).add(b).add(c)
+    val right = OldSet.empty.add(b).add(c).add(d)
 
     val leftIntersection = left.intersection(right)
 
@@ -161,7 +167,7 @@ class SetSuite extends FunSuite with Matchers {
   }
 
   test("difference on empty Set should yield an empty Set") {
-    Set.empty.difference(Set.empty)(randomString) shouldBe false
+    OldSet.empty.difference(OldSet.empty)(randomString) shouldBe false
   }
 
   test("difference on a non empty Set with an empty Set should yield an empty Set") {
@@ -170,7 +176,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty
+    val emptySet = OldSet.empty
     val nonEmptySet = emptySet.add(first).add(second)
 
     emptySet.difference(nonEmptySet)(first) shouldBe false
@@ -186,8 +192,8 @@ class SetSuite extends FunSuite with Matchers {
     val c = randomString
     val d = randomString
 
-    val left = Set.empty.add(a).add(b).add(c)
-    val right = Set.empty.add(b).add(c).add(d)
+    val left = OldSet.empty.add(a).add(b).add(c)
+    val right = OldSet.empty.add(b).add(c).add(d)
 
     val leftDifference = left.difference(right)
 
@@ -207,8 +213,8 @@ class SetSuite extends FunSuite with Matchers {
   test("isSubsetOf on an empty Set should yield true") {
     pending
 
-    Set.empty.isSubsetOf(Set.empty) shouldBe true
-    Set.empty.isSubsetOf(Set.empty.add(randomString)) shouldBe true
+    OldSet.empty.isSubsetOf(OldSet.empty) shouldBe true
+    OldSet.empty.isSubsetOf(OldSet.empty.add(randomString)) shouldBe true
   }
 
   private def randomString: String =
