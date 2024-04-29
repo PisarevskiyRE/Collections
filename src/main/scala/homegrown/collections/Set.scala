@@ -28,6 +28,8 @@ sealed trait Set extends (String => Boolean) {
   def isSingleton: Boolean
 
   def sample: Option[String]
+
+  def foreach(function: String => Unit): Unit
 }
 
 object Set {
@@ -82,6 +84,11 @@ object Set {
 
     final override def sample: Option[String] =
       Some(element)
+
+
+    final override def foreach(function: String => Unit): Unit = {
+      function(element)
+    }
   }
 
   private object Empty extends Set {
@@ -114,6 +121,8 @@ object Set {
 
     final override def sample: Option[String] =
       None
+
+    final override def foreach(function: String => Unit): Unit = ()
   }
 
   val empty: Set = Empty
