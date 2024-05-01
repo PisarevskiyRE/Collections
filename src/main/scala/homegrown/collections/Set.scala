@@ -5,7 +5,6 @@ sealed trait Set extends (String => Boolean) {
 
   final override def apply(input: String): Boolean = {
     var result = false
-
     foreach { current =>
       result = result || current == input
     }
@@ -14,29 +13,54 @@ sealed trait Set extends (String => Boolean) {
 
   final def add(input: String): Set = {
     var result = NonEmpty(input, empty)
-
     foreach { current =>
       if (input != current)
         result = NonEmpty(current, result)
     }
     result
   }
+
   final def remove(input: String): Set = {
     var result = empty
-
     foreach { current =>
       if (input != current)
         result = NonEmpty(current, result)
     }
-
     result
   }
 
-  def union(that: Set): Set
-  def intersection(that: Set): Set
-  def difference(that: Set): Set
+  final def union(that: Set): Set = {
+    var result = that
+    foreach { current =>
+      result = result.add(current)
+    }
+    result
+  }
 
-  def isSubsetOf(that: Set): Boolean
+  final def intersection(that: Set): Set = {
+    var result = empty
+    foreach { current =>
+      if (that(current))
+        result = result.add(current)
+    }
+    result
+  }
+
+  final def difference(that: Set): Set = {
+    var result = empty
+    foreach { current =>
+      if (!that(current))
+        result = result.add(current)
+    }
+    result
+  }
+  final def isSubsetOf(that: Set): Boolean = {
+    var result = true
+    foreach { current =>
+      result = result && that(current)
+    }
+    result
+  }
 
   final def isSupersetOf(that: Set): Boolean =
     that.isSubsetOf(this)
@@ -46,7 +70,13 @@ sealed trait Set extends (String => Boolean) {
     case _         => false
   }
 
-  def size: Int
+  final def size: Int = {
+    var result = 0
+    foreach { _ =>
+      result = result + 1
+    }
+    result
+  }
 
   final def isEmpty: Boolean =
     this eq Set.empty
@@ -54,15 +84,56 @@ sealed trait Set extends (String => Boolean) {
   final def nonEmpty: Boolean =
     !isEmpty
 
-  def isSingleton: Boolean
+  final def isSingleton: Boolean = {
+    if (isEmpty)
+      false
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty]
+      val otherElements = nonEmptySet.otherElements
 
-  def sample: Option[String]
+      otherElements.isEmpty
+    }
+  }
 
-  def foreach(function: String => Unit): Unit
+  final override def hashCode: Int = {
+    if (isEmpty) {
+      41
+    }
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+
+      element.hashCode + otherElements.hashCode
+    }
+  }
+
+  final def sample: Option[String] = {
+    if (isEmpty) {
+      None
+    }
+    else {
+      val nonEmptySet = this.asInstanceOf[NonEmpty]
+      val element = nonEmptySet.element
+      Some(element)
+    }
+  }
+
+  final def foreach(function: String => Unit): Unit = {
+    if (nonEmpty) {
+      //val NonEmpty(element, otherElements) = this
+
+      val nonEmptySet = this.asInstanceOf[NonEmpty]
+      val element = nonEmptySet.element
+      val otherElements = nonEmptySet.otherElements
+
+      function(element)
+      otherElements.foreach(function)
+    }
+  }
 }
 
 object Set {
-
   def apply(element: String, otherElements: String*): Set = {
     var result: Set = empty.add(element)
 
@@ -70,75 +141,23 @@ object Set {
       result = result.add(current)
     }
     result
+
   }
 
-  private final case class NonEmpty(element: String, otherElements: Set) extends Set {
-    final override def union(that: Set): Set =
-      otherElements.union(that.add(element))
+  private final case class NonEmpty(element: String, otherElements: Set) extends Set
 
-    final override def intersection(that: Set): Set = {
-      val intersectionOfOthers = otherElements.intersection(that)
-
-      if (that(element))
-        intersectionOfOthers.add(element)
-      else
-        intersectionOfOthers
-    }
-
-    final override def difference(that: Set): Set = {
-      val differenceOfOthers = otherElements.difference(that)
-
-      if (that(element))
-        differenceOfOthers
-      else
-        differenceOfOthers.add(element)
-    }
-
-    final override def isSubsetOf(that: Set): Boolean =
-      that(element) && otherElements.isSubsetOf(that)
-
-    final override def hashCode: Int =
-      element.hashCode + otherElements.hashCode
-
-    final override def size: Int =
-      1 + otherElements.size
-
-    final override def isSingleton: Boolean =
-      otherElements.isEmpty
-
-    final override def sample: Option[String] =
-      Some(element)
-
-    final override def foreach(function: String => Unit): Unit = {
-      function(element)
-      otherElements.foreach(function)
-    }
+  private object NonEmpty {
+    private[this] def unapply(any: Any): Option[(String, Set)] =
+      patternMatchingNotSupported
   }
 
-  private object Empty extends Set {
-    final override def union(that: Set): Set =
-      that
+  private object Empty extends Set
 
-    final override def intersection(that: Set): Set =
-      this
+  private[this] def unapply(any: Any): Option[(String, Set)] =
+    patternMatchingNotSupported
 
-    final override def difference(that: Set): Set =
-      this
-
-    final override def isSubsetOf(that: Set): Boolean =
-      true
-
-    final override def size: Int =
-      0
-
-    final override def isSingleton: Boolean =
-      false
-
-    final override def sample: Option[String] =
-      None
-
-    final override def foreach(function: String => Unit): Unit = ()
-  }
+  private[this] def patternMatchingNotSupported: Nothing =
+    sys.error("Not supported")
 
   val empty: Set = Empty
 }
