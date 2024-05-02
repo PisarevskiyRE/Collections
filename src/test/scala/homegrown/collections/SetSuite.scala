@@ -366,6 +366,7 @@ class SetSuite extends FunSuite with Matchers {
 
     set.foreach(_ => size += 1)
 
+
     size shouldBe 1
     size shouldBe set.size
   }
