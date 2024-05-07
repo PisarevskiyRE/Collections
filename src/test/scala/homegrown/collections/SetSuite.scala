@@ -400,19 +400,19 @@ class SetSuite extends FunSuite with Matchers {
     Set("hello", "world").map(_.size) shouldBe Set(5)
   }
 
-  //  test("flatMap should be able to produce a chessboard") {
-  //    val characters = Set('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
-  //    val numbers = Set(1, 2, 3, 4, 5, 6, 7, 8)
-  //
-  //    val chessboard: Set[(Char, Int)] =
-  //      characters.flatMap { c =>
-  //        numbers.map { n =>
-  //          c -> n
-  //        }
-  //      }
-  //
-  //    chessboard.size shouldBe 64
-  //  }
+  test("flatMap should be able to produce a chessboard") {
+    val characters = Set('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
+    val numbers = Set(1, 2, 3, 4, 5, 6, 7, 8)
+
+    val chessboard: Set[(Char, Int)] =
+      characters.flatMap { c =>
+        numbers.map { n =>
+          c -> n
+        }
+      }
+
+    chessboard.size shouldBe 64
+  }
 
   private def randomString: String =
     scala.util.Random.alphanumeric.take(5).mkString

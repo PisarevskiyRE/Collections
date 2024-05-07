@@ -139,6 +139,23 @@ sealed trait Set[Element] extends (Element => Boolean) {
     }
     result
   }
+
+  //  final def map[Result](function: Element => Result): Set[Result] = {
+  //    flatMap { current =>
+  //      Set(function(current))
+  //    }
+  //  }
+
+  final def flatMap[Result](function: Element => Set[Result]): Set[Result] = {
+    var result = empty[Result]
+    foreach { outerCurrent =>
+      function(outerCurrent).foreach { innerCurrent =>
+        result = result.add(innerCurrent)
+      }
+    }
+    result
+
+  }
 }
 
 object Set {
