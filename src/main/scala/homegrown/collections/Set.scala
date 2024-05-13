@@ -3,76 +3,47 @@ package homegrown.collections
 sealed trait Set[Element] extends (Element => Boolean) {
   import Set._
 
-  final def apply2(input: Element): Boolean = {
-    var result = false
-    foreach { current =>
-      result = result || current == input
-    }
-    result
-  }
+  final override def apply(input: Element): Boolean =
+    fold(false)(_ || _ == input)
 
-  final override def apply(input: Element): Boolean = {
-    val seed = false
-
-    var acc = seed
-    foreach { current =>
-      acc = acc || current == input
-    }
-
-    val result = acc
-    result
-
-    //    fold(seed = false) { (acc, current) =>
-    //        acc || current == input
-    //    }
-
-  }
-  final def fold[Result](seed: Result)(function: (Result, Element) => Result): Result = {
+  @scala.annotation.tailrec
+  final def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
     if (isEmpty)
       seed
     else {
-      //val NonEmpty(element, otherElements) = this
-
       val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
       val element = nonEmptySet.element
       val otherElements = nonEmptySet.otherElements
 
-      val elementResult: Result = function(seed, element)
-      val result: Result = otherElements.fold(elementResult)(function)
-
-      result
+      otherElements.fold(function(seed, element))(function)
     }
-  }
 
   final def foreach[Result](function: Element => Result): Unit = {
-    if (isEmpty)
-      ()
-    else {
-      //val NonEmpty(element, otherElements) = this
-
-      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
-      val element = nonEmptySet.element
-      val otherElements = nonEmptySet.otherElements
-
-      val elementResult: Unit = function(element)
-      val result: Unit = otherElements.foreach(function)
-
-      result
+    fold(()) { (_, current) =>
+      function(current)
     }
   }
 
   final def add(input: Element): Set[Element] = {
-    val seed = NonEmpty(input, empty)
+//    val seed = NonEmpty(input, empty)
+//
+//    var acc = seed
+//
+//    foreach { current =>
+//      if (input != current)
+//        acc = NonEmpty(current, acc)
+//    }
+//
+//    val result = acc
+//    result
 
-    var acc = seed
-
-    foreach { current =>
+    fold(NonEmpty(input, empty)) { (acc, current) =>
       if (input != current)
-        acc = NonEmpty(current, acc)
+        NonEmpty(current, acc)
+      else
+        acc
     }
 
-    val result = acc
-    result
   }
 
   final def remove(input: Element): Set[Element] = {
