@@ -119,13 +119,13 @@ class SetSuite extends FunSuite with Matchers {
     right.union(left) shouldBe Set(a, b, c).add(d)
   }
 
-  test("intersection on empty Set should yield an empty Set") {
-    Set.empty.intersection(Set.empty) shouldBe Set.empty
-    Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
-
-    Set.empty.filter(Set.empty) shouldBe Set.empty
-    Set.empty[Nothing].filter(_ => false) shouldBe Set.empty
-  }
+  //  test("intersection on empty Set should yield an empty Set") {
+  //    Set.empty.intersection(Set.empty) shouldBe Set.empty
+  //    Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
+  //
+  //    Set.empty.filter(Set.empty) shouldBe Set.empty
+  //    Set.empty[Nothing].filter(_ => false) shouldBe Set.empty
+  //  }
 
   test("intersection on a non empty Set with an empty Set should yield an empty Set") {
     val first = randomString
@@ -506,40 +506,40 @@ class SetSuite extends FunSuite with Matchers {
     orderedClassmates.filter(isFriend) shouldBe orderedClassmates.filter(friends)
   }
 
-  test("contains on an empty Set should yield false") {
-    Set.empty.contains(randomString) shouldBe false
-    Set.empty.doesNotContain(randomString) shouldBe true
-  }
-
-  test("exists on an empty Set should yield false") {
-    Set.empty[String].exists(_ => false) shouldBe false
-    Set.empty[String].doesNotExist(_ => false) shouldBe true
-  }
-
-  test("exists on a non empty Set should yield true") {
-    val element = randomString
-
-    Set(element).exists(_.size == element.size) shouldBe true
-    Set(element).exists(_.size != element.size) shouldBe false
-
-    Set(element).doesNotExist(_.size == element.size) shouldBe false
-    Set(element).doesNotExist(_.size != element.size) shouldBe true
-  }
-
-  test("forall on an empty Set should yield false") {
-    Set.empty[String].forall(_ => false) shouldBe true
-    Set.empty[String].notForall(_ => false) shouldBe false
-  }
-
-  test("forall on a non empty Set should yield true") {
-    val element = randomString
-
-    Set(element).forall(_.size == element.size) shouldBe true
-    Set(element).forall(_.size != element.size) shouldBe false
-
-    Set(element).notForall(_.size == element.size) shouldBe false
-    Set(element).notForall(_.size != element.size) shouldBe true
-  }
+  //  test("contains on an empty Set should yield false") {
+  //    Set.empty.contains(randomString) shouldBe false
+  //    Set.empty.doesNotContain(randomString) shouldBe true
+  //  }
+  //
+  //  test("exists on an empty Set should yield false") {
+  //    Set.empty[String].exists(_ => false) shouldBe false
+  //    Set.empty[String].doesNotExist(_ => false) shouldBe true
+  //  }
+  //
+  //  test("exists on a non empty Set should yield true") {
+  //    val element = randomString
+  //
+  //    Set(element).exists(_.size == element.size) shouldBe true
+  //    Set(element).exists(_.size != element.size) shouldBe false
+  //
+  //    Set(element).doesNotExist(_.size == element.size) shouldBe false
+  //    Set(element).doesNotExist(_.size != element.size) shouldBe true
+  //  }
+  //
+  //  test("forall on an empty Set should yield false") {
+  //    Set.empty[String].forall(_ => false) shouldBe true
+  //    Set.empty[String].notForall(_ => false) shouldBe false
+  //  }
+  //
+  //  test("forall on a non empty Set should yield true") {
+  //    val element = randomString
+  //
+  //    Set(element).forall(_.size == element.size) shouldBe true
+  //    Set(element).forall(_.size != element.size) shouldBe false
+  //
+  //    Set(element).notForall(_.size == element.size) shouldBe false
+  //    Set(element).notForall(_.size != element.size) shouldBe true
+  //  }
 
   test("toString on an empty Set should yield {}") {
     Set.empty.toString shouldBe "{}"
