@@ -43,13 +43,17 @@ sealed trait Set[Element] extends (Element => Boolean) {
   final def union(that: Set[Element]): Set[Element] =
     fold(that)(_ add _)
 
-  final def intersection(that: Set[Element]): Set[Element] =
+  final def intersection(predicate: Element => Boolean): Set[Element] =
+    filter(predicate)
+
+  final def filter(predicate: Element => Boolean): Set[Element] =
     fold(empty[Element]) { (acc, current) =>
-      if (that(current))
+      if (predicate(current))
         acc.add(current)
       else
         acc
     }
+
 
   final def difference(that: Set[Element]): Set[Element] =
     fold(empty[Element]) { (acc, current) =>
