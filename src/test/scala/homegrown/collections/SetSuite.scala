@@ -119,13 +119,13 @@ class SetSuite extends FunSuite with Matchers {
     right.union(left) shouldBe Set(a, b, c).add(d)
   }
 
-    test("intersection on empty Set should yield an empty Set") {
-      Set.empty.intersection(Set.empty) shouldBe Set.empty
-      Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
+  test("intersection on empty Set should yield an empty Set") {
+    Set.empty.intersection(Set.empty) shouldBe Set.empty
+    Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
 
-      Set.empty.filter(Set.empty) shouldBe Set.empty
-      Set.empty[Nothing].filter(_ => false) shouldBe Set.empty
-    }
+    Set.empty.filter(Set.empty) shouldBe Set.empty
+    Set.empty[Nothing].filter(_ => false) shouldBe Set.empty
+  }
 
   test("intersection on a non empty Set with an empty Set should yield an empty Set") {
     val first = randomString
