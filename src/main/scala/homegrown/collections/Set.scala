@@ -92,12 +92,9 @@ sealed trait Set[Element] extends (Element => Boolean) {
     if (isEmpty)
       "{}"
     else {
-
       val otherElementsSplitByCommaSpace = otherElementsOrThrowException.fold("") { (acc, current) =>
-
         s"$acc, $current"
       }
-
       "{" + elementOrThrowException + otherElementsSplitByCommaSpace + "}"
     }
 
