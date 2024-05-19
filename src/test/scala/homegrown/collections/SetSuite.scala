@@ -548,7 +548,7 @@ class SetSuite extends FunSuite with Matchers {
   test("toString on a Set with one element should yield {oneElement}") {
     val element = randomString
 
-    Set(element).toString shouldBe s"{ $element }"
+    Set(element).toString shouldBe s"{$element}"
   }
 
   test("toString on a Set with two elements should contain 2 braces, both elements, 2 parens and one comma") {

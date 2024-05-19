@@ -26,8 +26,6 @@ sealed trait Set[Element] extends (Element => Boolean) {
   final def forall(predicate: Element => Boolean): Boolean =
     fold(true)(_ && predicate(_))
 
-
-
   final def foreach[Result](function: Element => Result): Unit = {
     fold(()) { (_, current) =>
       function(current)
@@ -92,9 +90,16 @@ sealed trait Set[Element] extends (Element => Boolean) {
 
   final override def toString(): String =
     if (isEmpty)
-      "Set()"
-    else
-      ???
+      "{}"
+    else {
+
+      val otherElementsSplitByCommaSpace = otherElementsOrThrowException.fold("") { (acc, current) =>
+
+        s"$acc, $current"
+      }
+
+      "{" + elementOrThrowException + otherElementsSplitByCommaSpace + "}"
+    }
 
   final def size: Int = {
     fold(0) { (acc, current) =>
@@ -108,27 +113,14 @@ sealed trait Set[Element] extends (Element => Boolean) {
   final def nonEmpty: Boolean =
     !isEmpty
 
-  final def isSingleton: Boolean = {
+  final def isSingleton: Boolean =
+    nonEmpty && otherElementsOrThrowException.isEmpty
+
+  final def sample: Option[Element] =
     if (isEmpty)
-      false
-    else {
-      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
-      val otherElements = nonEmptySet.otherElements
-
-      otherElements.isEmpty
-    }
-  }
-
-  final def sample: Option[Element] = {
-    if (isEmpty) {
       None
-    }
-    else {
-      val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
-      val element = nonEmptySet.element
-      Some(element)
-    }
-  }
+    else
+      Some(elementOrThrowException)
 
   final def map[Result](function: Element => Result): Set[Result] = {
     fold(empty[Result]) { (acc, current) =>
@@ -143,17 +135,12 @@ sealed trait Set[Element] extends (Element => Boolean) {
       }
     }
 
-
-
   @scala.annotation.tailrec
   final def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
     if (isEmpty)
       seed
-    else {
+    else
       otherElementsOrThrowException.fold(function(seed, elementOrThrowException))(function)
-    }
-
-
 
   private[this] lazy val (elementOrThrowException, otherElementsOrThrowException) = {
     val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
