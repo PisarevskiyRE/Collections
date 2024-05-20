@@ -96,7 +96,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty[String]
+    val emptySet = Set.empty
     val nonEmptySet = Set(first, second)
 
     emptySet.union(nonEmptySet)(first) shouldBe true
@@ -119,12 +119,20 @@ class SetSuite extends FunSuite with Matchers {
     right.union(left) shouldBe Set(a, b, c).add(d)
   }
 
+  test("union with variance") {
+    val (employee, consultant) = bothRoles
+
+    Set(employee).union(Set(consultant)) shouldBe Set(employee, consultant)
+
+    Set[Employee](employee).add(consultant: CompanyRole) shouldBe Set[CompanyRole](employee, consultant)
+  }
+
   test("intersection on empty Set should yield an empty Set") {
     Set.empty.intersection(Set.empty) shouldBe Set.empty
-    Set.empty[Nothing].intersection(_ => false) shouldBe Set.empty
+    Set.empty.intersection(_ => false) shouldBe Set.empty
 
     Set.empty.filter(Set.empty) shouldBe Set.empty
-    Set.empty[Nothing].filter(_ => false) shouldBe Set.empty
+    Set.empty.filter(_ => false) shouldBe Set.empty
   }
 
   test("intersection on a non empty Set with an empty Set should yield an empty Set") {
@@ -133,7 +141,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty[String]
+    val emptySet = Set.empty
     val nonEmptySet = Set(first, second)
 
     emptySet.intersection(nonEmptySet)(first) shouldBe false
@@ -166,7 +174,7 @@ class SetSuite extends FunSuite with Matchers {
 
     first should not be second
 
-    val emptySet = Set.empty[String]
+    val emptySet = Set.empty
     val nonEmptySet = Set(first, second)
 
     emptySet.difference(nonEmptySet)(first) shouldBe false
@@ -187,6 +195,16 @@ class SetSuite extends FunSuite with Matchers {
 
     left.difference(right) shouldBe Set(a)
     right.difference(left) shouldBe Set(d)
+  }
+
+  test("difference on two sets with different types should yield a Set with the common type") {
+    val (employee, consultant) = bothRoles
+
+    val employeeSet = Set(employee)
+    val consultantSet = Set(consultant)
+
+    employeeSet.difference(consultantSet) shouldBe employeeSet
+    consultantSet.difference(employeeSet) shouldBe consultantSet
   }
 
   test("isSubsetOf on an empty Set should yield true") {
@@ -400,7 +418,7 @@ class SetSuite extends FunSuite with Matchers {
   }
 
   test("foreach on an empty Set should not apply the function") {
-    noException should be thrownBy Set.empty[String].foreach(_ => sys.error("should not be thrown"))
+    noException should be thrownBy Set.empty.foreach(_ => sys.error("should not be thrown"))
   }
 
   test("foreach on a non empty Set should apply the function") {
@@ -458,11 +476,11 @@ class SetSuite extends FunSuite with Matchers {
   }
 
   test("foreach should be parameterized in the result of the argument function so that it does not produce warnings") {
-    Set.empty[String].foreach(_ => 1)
+    Set.empty.foreach(_ => 1)
   }
 
   test("map on an empty Set should not apply the function") {
-    noException should be thrownBy Set.empty[String].map(_ => sys.error("should not be thrown"))
+    noException should be thrownBy Set.empty.map(_ => sys.error("should not be thrown"))
   }
 
   test("map should produce a Set") {
@@ -495,7 +513,7 @@ class SetSuite extends FunSuite with Matchers {
 
     def isFriend(potentialFriend: String): Boolean =
       potentialFriend == "frank" || // format: OFF
-        potentialFriend == "bob" // format:
+        potentialFriend == "bob" // format: ON
 
     orderedClassmates.filter(isFriend) shouldBe Seq("bob", "frank")
 
@@ -506,40 +524,60 @@ class SetSuite extends FunSuite with Matchers {
     orderedClassmates.filter(isFriend) shouldBe orderedClassmates.filter(friends)
   }
 
-    test("contains on an empty Set should yield false") {
-      Set.empty.contains(randomString) shouldBe false
-      Set.empty.doesNotContain(randomString) shouldBe true
-    }
+  test("contains on an empty Set should yield false") {
+    Set.empty.contains(randomString) shouldBe false
+    Set.empty.doesNotContain(randomString) shouldBe true
+  }
 
-    test("exists on an empty Set should yield false") {
-      Set.empty[String].exists(_ => false) shouldBe false
-      Set.empty[String].doesNotExist(_ => false) shouldBe true
-    }
+  test("exists on an empty Set should yield false") {
+    Set.empty.exists(_ => false) shouldBe false
+    Set.empty.doesNotExist(_ => false) shouldBe true
+  }
 
-    test("exists on a non empty Set should yield true") {
-      val element = randomString
+  test("exists on a non empty Set should yield true") {
+    val element = randomString
 
-      Set(element).exists(_.size == element.size) shouldBe true
-      Set(element).exists(_.size != element.size) shouldBe false
+    Set(element).exists(_.size == element.size) shouldBe true
+    Set(element).exists(_.size != element.size) shouldBe false
 
-      Set(element).doesNotExist(_.size == element.size) shouldBe false
-      Set(element).doesNotExist(_.size != element.size) shouldBe true
-    }
+    Set(element).doesNotExist(_.size == element.size) shouldBe false
+    Set(element).doesNotExist(_.size != element.size) shouldBe true
+  }
 
-    test("forall on an empty Set should yield false") {
-      Set.empty[String].forall(_ => false) shouldBe true
-      Set.empty[String].notForall(_ => false) shouldBe false
-    }
+  test("exists with variance") {
+    val (employee, consultant) = bothRoles
 
-    test("forall on a non empty Set should yield true") {
-      val element = randomString
+    Set(employee).exists(_ == employee) shouldBe true
+    // Set(employee).exists(_ == consultant) shouldBe false // compiles :( with a warning :)
 
-      Set(element).forall(_.size == element.size) shouldBe true
-      Set(element).forall(_.size != element.size) shouldBe false
+    Set[Employee](employee).exists(_ == employee) shouldBe true
+    Set[CompanyRole](employee).exists(_ == employee) shouldBe true
 
-      Set(element).notForall(_.size == element.size) shouldBe false
-      Set(element).notForall(_.size != element.size) shouldBe true
-    }
+    Set[Employee](employee).exists((input: Employee) => input == employee) shouldBe true
+    Set[Employee](employee).exists((input: CompanyRole) => input == employee) shouldBe true
+    Set[CompanyRole](employee).exists((input: CompanyRole) => input == employee) shouldBe true
+    "Set[CompanyRole](employee).exists((input: Employee) => input == employee)" shouldNot typeCheck
+
+    Set[Employee](employee).exists(Set[Employee](employee)) shouldBe true
+    Set[Employee](employee).exists(Set[CompanyRole](employee)) shouldBe true
+    Set[CompanyRole](employee).exists(Set[CompanyRole](employee)) shouldBe true
+    Set[CompanyRole](employee).exists(Set[Employee](employee)) shouldBe true
+  }
+
+  test("forall on an empty Set should yield false") {
+    Set.empty.forall(_ => false) shouldBe true
+    Set.empty.notForall(_ => false) shouldBe false
+  }
+
+  test("forall on a non empty Set should yield true") {
+    val element = randomString
+
+    Set(element).forall(_.size == element.size) shouldBe true
+    Set(element).forall(_.size != element.size) shouldBe false
+
+    Set(element).notForall(_.size == element.size) shouldBe false
+    Set(element).notForall(_.size != element.size) shouldBe true
+  }
 
   test("toString on an empty Set should yield {}") {
     Set.empty.toString shouldBe "{}"
@@ -548,7 +586,7 @@ class SetSuite extends FunSuite with Matchers {
   test("toString on a Set with one element should yield {oneElement}") {
     val element = randomString
 
-    Set(element).toString shouldBe s"{$element}"
+    Set(element).toString shouldBe s"{ $element }"
   }
 
   test("toString on a Set with two elements should contain 2 braces, both elements, 2 parens and one comma") {
@@ -597,6 +635,37 @@ class SetSuite extends FunSuite with Matchers {
     actual.count(_ == '}') shouldBe 1
   }
 
+  private def bothRoles: (Employee, Consultant) =
+    randomEmployee -> randomConsultant
+
+  private def randomEmployee: Employee =
+    Employee(
+      id = randomString
+    )
+
+  private def randomConsultant: Consultant =
+    Consultant(
+      id          = randomString,
+      companyName = randomString
+    )
+
   private def randomString: String =
     scala.util.Random.alphanumeric.take(5).mkString
+}
+
+sealed trait CompanyRole {
+  def id: String
+  final def roleName: String = getClass.toString
+}
+
+final case class Employee(id: String) extends CompanyRole {
+  final def takeVacation(): Unit = {
+    println("taking a vacation")
+  }
+}
+
+final case class Consultant(id: String, companyName: String) extends CompanyRole {
+  final def submitInvoice(): Unit = {
+    println("here is my invoice")
+  }
 }
