@@ -14,6 +14,11 @@ initialCommands in console := "import homegrown.collections._"
 //resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 
 
+scalacOptions ++= Seq(
+  "-feature",
+  "-language:implicitConversions"
+)
+
 libraryDependencies ++=
   Seq(
     "org.scalatest" %%  "scalatest" %  "3.0.5" % "test", // http://www.scalatest.org/

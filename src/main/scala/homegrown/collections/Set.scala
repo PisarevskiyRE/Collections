@@ -2,10 +2,10 @@ package homegrown.collections
 
 import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
 
-sealed trait Set[Element] extends (Element => Boolean) {
+sealed trait Set[Element] /*extends (Element => Boolean)*/ {
   import Set._
 
-  final override def apply(input: Element): Boolean =
+  final /*override*/ def apply(input: Element): Boolean =
     contains(input)
 
   final def contains(input: Element): Boolean =
@@ -32,7 +32,7 @@ sealed trait Set[Element] extends (Element => Boolean) {
     }
   }
 
-  final def add(input: Element): Set[Element] =
+  final def add[Super >: Element](input: Super): Set[Super] =
     fold(NonEmpty(input, empty)) { (acc, current) =>
       if (current == input)
         acc
@@ -48,7 +48,7 @@ sealed trait Set[Element] extends (Element => Boolean) {
         NonEmpty(current, acc)
     }
 
-  final def union(that: Set[Element]): Set[Element] =
+  final def union[Super >: Element](that: Set[Super]): Set[Super] =
     fold(that)(_ add _)
 
   final def intersection(predicate: Element => Boolean): Set[Element] =
@@ -173,4 +173,7 @@ object Set {
     sys.error("pattern matching on Sets is expensive and therefore not supported")
 
   def empty[Element]: Set[Element] = new Empty[Element]
+
+  implicit def SetCanBeUsedAsFunction1[Element](set: Set[Element]): Element => Boolean =
+    set.apply
 }
