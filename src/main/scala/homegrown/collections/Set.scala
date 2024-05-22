@@ -2,16 +2,16 @@ package homegrown.collections
 
 import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
 
-sealed trait Set[Element] /*extends (Element => Boolean)*/ {
+sealed trait Set[+Element] /*extends (Element => Boolean)*/ {
   import Set._
 
-  final /*override*/ def apply(input: Element): Boolean =
+  final /*override*/ def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-  final def contains(input: Element): Boolean =
+  final def contains[Super >: Element](input: Super): Boolean =
     exists(_ == input)
 
-  final def doesNotContain(input: Element): Boolean =
+  final def doesNotContain[Super >: Element](input: Super): Boolean =
     !contains(input)
 
   final def doesNotExist(predicate: Element => Boolean): Boolean =
@@ -40,7 +40,7 @@ sealed trait Set[Element] /*extends (Element => Boolean)*/ {
         NonEmpty(current, acc)
     }
 
-  final def remove(input: Element): Set[Element] =
+  final def remove[Super >: Element](input: Super): Set[Super] =
     fold(empty[Element]) { (acc, current) =>
       if (current == input)
         acc
@@ -75,7 +75,7 @@ sealed trait Set[Element] /*extends (Element => Boolean)*/ {
       acc && predicate(current)
     }
 
-  final def isSupersetOf(that: Set[Element]): Boolean =
+  final def isSupersetOf[Super >: Element](that: Set[Super]): Boolean =
     that.isSubsetOf(this)
 
   final override def equals(other: Any): Boolean = other match {
