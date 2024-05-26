@@ -2,10 +2,10 @@ package homegrown.collections
 
 import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
 
-sealed trait Set[+Element] /*extends (Element => Boolean)*/ {
+sealed trait Set[+Element]  {
   import Set._
 
-  final /*override*/ def apply[Super >: Element](input: Super): Boolean =
+  final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
   final def contains[Super >: Element](input: Super): Boolean =
