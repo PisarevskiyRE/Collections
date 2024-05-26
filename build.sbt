@@ -15,6 +15,8 @@ initialCommands in console := "import homegrown.collections._"
 
 
 scalacOptions ++= Seq(
+
+
   "-feature",
   "-language:implicitConversions",
   "-Xlint"
