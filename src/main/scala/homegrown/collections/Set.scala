@@ -2,29 +2,12 @@ package homegrown.collections
 
 import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
 
-sealed trait Set[+Element]  {
+sealed trait Set[+Element] extends Foldable[Element] {
   import Set._
 
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-  final def contains[Super >: Element](input: Super): Boolean =
-    exists(_ == input)
-
-  final def doesNotContain[Super >: Element](input: Super): Boolean =
-    !contains(input)
-
-  final def doesNotExist(predicate: Element => Boolean): Boolean =
-    !exists(predicate)
-
-  final def exists(predicate: Element => Boolean): Boolean =
-    fold(false)(_ || predicate(_))
-
-  final def notForall(predicate: Element => Boolean): Boolean =
-    !forall(predicate)
-
-  final def forall(predicate: Element => Boolean): Boolean =
-    fold(true)(_ && predicate(_))
 
   final def foreach[Result](function: Element => Result): Unit = {
     fold(()) { (_, current) =>
@@ -133,7 +116,7 @@ sealed trait Set[+Element]  {
     }
 
   @scala.annotation.tailrec
-  final def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
+  final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
     if (isEmpty)
       seed
     else
