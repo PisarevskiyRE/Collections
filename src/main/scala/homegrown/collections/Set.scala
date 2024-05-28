@@ -5,15 +5,15 @@ import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Pre
 sealed trait Set[+Element] extends Foldable[Element] {
   import Set._
 
+  @scala.annotation.tailrec
+  final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
+    if (isEmpty)
+      seed
+    else
+      otherElementsOrThrowException.fold(function(seed, elementOrThrowException))(function)
+
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
-
-
-  final def foreach[Result](function: Element => Result): Unit = {
-    fold(()) { (_, current) =>
-      function(current)
-    }
-  }
 
   final def add[Super >: Element](input: Super): Set[Super] =
     fold(NonEmpty(input, empty)) { (acc, current) =>
@@ -81,12 +81,6 @@ sealed trait Set[+Element] extends Foldable[Element] {
       "{" + elementOrThrowException + otherElementsSplitByCommaSpace + "}"
     }
 
-  final def size: Int = {
-    fold(0) { (acc, current) =>
-      acc + 1
-    }
-  }
-
   final def isEmpty: Boolean =
     this.isInstanceOf[Empty.type]
 
@@ -114,13 +108,6 @@ sealed trait Set[+Element] extends Foldable[Element] {
         innerAcc.add(innerCurrent)
       }
     }
-
-  @scala.annotation.tailrec
-  final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
-    if (isEmpty)
-      seed
-    else
-      otherElementsOrThrowException.fold(function(seed, elementOrThrowException))(function)
 
   private[this] lazy val (elementOrThrowException, otherElementsOrThrowException) = {
     val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]

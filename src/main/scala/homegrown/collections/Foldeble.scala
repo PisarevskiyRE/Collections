@@ -3,10 +3,19 @@ package homegrown.collections
 trait Foldable[+Element] {
   def fold[Result](seed: Result)(function: (Result, Element) => Result): Result
 
+  def size: Int = {
+    fold(0) { (acc, current) =>
+      acc + 1
+    }
+  }
+
+//  def isEmpty: Boolean
+
+
   final def doesNotContain[Super >: Element](input: Super): Boolean =
     !contains(input)
 
-   def contains[Super >: Element](input: Super): Boolean =
+  def contains[Super >: Element](input: Super): Boolean =
     exists(_ == input)
 
   final def doesNotExist(predicate: Element => Boolean): Boolean =
@@ -18,8 +27,13 @@ trait Foldable[+Element] {
   final def notForall(predicate: Element => Boolean): Boolean =
     !forall(predicate)
 
-  final def forall(predicate: Element => Boolean): Boolean =
+  def forall(predicate: Element => Boolean): Boolean =
     fold(true)(_ && predicate(_))
 
+  final def foreach[Result](function: Element => Result): Unit = {
+    fold(()) { (_, current) =>
+      function(current)
+    }
+  }
 
 }
