@@ -19,6 +19,7 @@ scalacOptions ++= Seq(
 
   "-feature",
   "-language:implicitConversions",
+  "-language:higherKinds",
   "-Xlint"
 )
 

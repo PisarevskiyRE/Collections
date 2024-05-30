@@ -9,8 +9,7 @@ trait Foldable[+Element] {
     }
   }
 
-//  def isEmpty: Boolean
-
+  //  def isEmpty: Boolean
 
   final def doesNotContain[Super >: Element](input: Super): Boolean =
     !contains(input)
