@@ -2,8 +2,11 @@ package homegrown.collections
 
 import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
 
-sealed trait Set[+Element] extends Foldable[Element] {
+sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   import Set._
+
+  final override protected def empty: Set[Nothing] =
+    Set.empty
 
   @scala.annotation.tailrec
   final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
@@ -36,14 +39,6 @@ sealed trait Set[+Element] extends Foldable[Element] {
 
   final def intersection(predicate: Element => Boolean): Set[Element] =
     filter(predicate)
-
-  final def filter(predicate: Element => Boolean): Set[Element] =
-    fold[Set[Element]](empty) { (acc, current) =>
-      if (predicate(current))
-        acc.add(current)
-      else
-        acc
-    }
 
   final def difference(predicate: Element => Boolean): Set[Element] =
     fold[Set[Element]](empty) { (acc, current) =>
@@ -96,18 +91,7 @@ sealed trait Set[+Element] extends Foldable[Element] {
     else
       Some(elementOrThrowException)
 
-  final def map[Result](function: Element => Result): Set[Result] = {
-    fold[Set[Result]](empty) { (acc, current) =>
-      acc.add(function(current))
-    }
-  }
 
-  final def flatMap[Result](function: Element => Set[Result]): Set[Result] =
-    fold[Set[Result]](empty) { (outerAcc, outerCurrent) =>
-      function(outerCurrent).fold(outerAcc) { (innerAcc, innerCurrent) =>
-        innerAcc.add(innerCurrent)
-      }
-    }
 
   private[this] lazy val (elementOrThrowException, otherElementsOrThrowException) = {
     val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
