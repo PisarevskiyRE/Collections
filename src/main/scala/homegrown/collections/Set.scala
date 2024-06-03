@@ -5,8 +5,8 @@ import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Pre
 sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   import Set._
 
-  final override protected def empty: Set[Nothing] =
-    Set.empty
+  final override protected def factory: Factory[Set] =
+    Set
 
   @scala.annotation.tailrec
   final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
@@ -18,7 +18,7 @@ sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-  final def add[Super >: Element](input: Super): Set[Super] =
+  final override def add[Super >: Element](input: Super): Set[Super] =
     fold(NonEmpty(input, empty)) { (acc, current) =>
       if (current == input)
         acc
@@ -26,7 +26,7 @@ sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
         NonEmpty(current, acc)
     }
 
-  final def remove[Super >: Element](input: Super): Set[Super] =
+  final override def remove[Super >: Element](input: Super): Set[Super] =
     fold[Set[Super]](empty) { (acc, current) =>
       if (current == input)
         acc
@@ -91,8 +91,6 @@ sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
     else
       Some(elementOrThrowException)
 
-
-
   private[this] lazy val (elementOrThrowException, otherElementsOrThrowException) = {
     val nonEmptySet = this.asInstanceOf[NonEmpty[Element]]
     val element = nonEmptySet.element
@@ -102,11 +100,7 @@ sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   }
 }
 
-object Set {
-  def apply[Element](element: Element, otherElements: Element*): Set[Element] =
-    otherElements.foldLeft[Set[Element]](empty.add(element)) { (acc, current) =>
-      acc.add(current)
-    }
+object Set extends Factory[Set] {
 
   private final case class NonEmpty[Element](element: Element, otherElements: Set[Element]) extends Set[Element]
 
@@ -126,7 +120,7 @@ object Set {
   private[this] def patternMatchingNotSupported: Nothing =
     sys.error("pattern matching on Sets is expensive and therefore not supported")
 
-  def empty: Set[Nothing] = Empty
+  final override def empty: Set[Nothing] = Empty
 
   implicit def SetCanBeUsedAsFunction1[Element](set: Set[Element]): Element => Boolean =
     set.apply
