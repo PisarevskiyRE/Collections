@@ -1,7 +1,5 @@
 package homegrown.collections
 
-import org.graalvm.compiler.asm.amd64.AMD64VectorAssembler.VexFloatCompareOp.Predicate
-
 sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   import Set._
 
