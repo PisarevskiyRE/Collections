@@ -16,8 +16,6 @@ sealed trait Set[+Element] extends FoldableFactory[Element, Set] {
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-
-
   final override def add[Super >: Element](input: Super): Set[Super] =
     fold(NonEmpty(input, empty)) { (acc, current) =>
       if (current == input)
