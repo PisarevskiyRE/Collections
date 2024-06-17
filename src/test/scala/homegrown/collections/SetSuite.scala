@@ -87,6 +87,11 @@ class SetSuite extends FunSuite with Matchers {
     set(element) shouldBe false
   }
 
+  test("remove should remove elements from both sides of the tree") {
+    Set(1, 2, 3).remove(3) shouldBe Set(1, 2)
+    Set(1, -2, -3).remove(-3) shouldBe Set(1, -2)
+  }
+
   test("union on empty Set should yield an empty Set") {
     Set.empty.union(Set.empty) shouldBe Set.empty
   }
@@ -598,7 +603,7 @@ class SetSuite extends FunSuite with Matchers {
   test("toString on a Set with one element should yield {oneElement}") {
     val element = randomString
 
-    Set(element).toString shouldBe s"{$element}"
+    Set(element).toString shouldBe s"{ $element }"
   }
 
   test("toString on a Set with two elements should contain 2 braces, both elements, 2 parens and one comma") {
@@ -645,6 +650,10 @@ class SetSuite extends FunSuite with Matchers {
     actual should include(third)
 
     actual.count(_ == '}') shouldBe 1
+  }
+
+  test("toString should not produce any commas with leading spaces") {
+    Set(1, 0).toString should not include (" ,")
   }
 
   private def bothRoles: (Employee, Consultant) =
