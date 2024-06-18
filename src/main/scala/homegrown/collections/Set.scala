@@ -82,9 +82,13 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
   final def isSupersetOf[Super >: Element](that: Set[Super]): Boolean =
     that.isSubsetOf(this)
 
-  final override def equals(other: Any): Boolean = other match {
-    case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
-    case _                  => false
+  final override def equals(other: Any): Boolean = {
+    println("equals")
+
+    other match {
+      case that: Set[Element] => this.isSubsetOf(that) && that.isSubsetOf(this)
+      case _                  => false
+    }
   }
 
   final override def hashCode: Int =
@@ -102,7 +106,7 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
 }
 
 object Set extends Factory[Set] {
-  private final case class NonEmpty[+Element](left: Set[Element], element: Element, right: Set[Element]) extends Set[Element] {
+  /*private*/ final case class NonEmpty[+Element](left: Set[Element], element: Element, right: Set[Element]) extends Set[Element] {
     final def isSingleton: Boolean =
       left.isEmpty && right.isEmpty
 
@@ -125,7 +129,7 @@ object Set extends Factory[Set] {
     // $COVERAGE-ON$
   }
 
-  private object Empty extends Set[Nothing] {
+  /*private*/ object Empty extends Set[Nothing] {
     final override def isSingleton: Boolean =
       false
 
@@ -155,4 +159,28 @@ object Set extends Factory[Set] {
 
   implicit def SetCanBeUsedAsFunction1[Element](set: Set[Element]): Element => Boolean =
     set.apply
+}
+
+object Main extends App {
+  println("-" * 50)
+
+  val someSet = Set.empty
+
+//  someSet match {
+//    case _ =>
+//  }
+//
+//  someSet match {
+//    case Set.Empty =>
+//    case _ =>
+//  }
+
+
+  someSet match {
+    case Set.NonEmpty(left, element, right) =>
+    case _ =>
+  }
+
+  println("-" * 50)
+
 }
