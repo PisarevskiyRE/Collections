@@ -9,6 +9,7 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
+
   final override def contains[Super >: Element](input: Super): Boolean =
     this match {
       case Empty =>
