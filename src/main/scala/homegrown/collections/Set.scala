@@ -178,3 +178,4 @@ object Set extends Factory[Set] {
   implicit def SetCanBeUsedAsFunction1[Element](set: Set[Element]): Element => Boolean =
     set.apply
 }
+
