@@ -158,6 +158,7 @@ object Set extends Factory[Set] {
 
   private object Empty extends Set[Nothing] {
     /** case Empty => causes stack overflows in methods like fold
+     *
       * case Empty() => does not
       */
     def unapply[Element](set: Set[Element]): Boolean =
