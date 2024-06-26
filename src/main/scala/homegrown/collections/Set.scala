@@ -245,6 +245,7 @@ object Set extends Factory[Set] {
     private lazy val bottom: Case = {
       case NonEmpty(Black, a, x, NonEmpty(Red, NonEmpty(Red, b, y, c), z, d)) =>
         solution(a, b, c, d, x, y, z)
+
     }
 
     private lazy val left: Case = {
