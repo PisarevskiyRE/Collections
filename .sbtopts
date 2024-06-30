@@ -1,0 +1,2 @@
+-J-XX:+PrintCommandLineFlags #PrintCommandLineFlags
+-J-Xss1G
