@@ -1,2 +1,4 @@
 -J-XX:+PrintCommandLineFlags #PrintCommandLineFlags
--J-Xss1G
+-J-Xss1G                       #ThreadStackSize
+-J-Xms24G                       #InitialHeapSize
+-J-Xmx1T                        #MaxHeapSiza
