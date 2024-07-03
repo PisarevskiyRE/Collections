@@ -6,16 +6,16 @@ sealed abstract class Stack[+Element] {
   final def push[Super >: Element](input: Super): Stack[Super] =
     NonEmpty(input, this)
 
-  final lazy val (peek, pop) = popElement
+  final lazy val (peak, pop) = popElement
 
   final def popElement: (Option[Element], Stack[Element]) =
     this match {
       case Empty =>
         None -> empty
+
       case NonEmpty(element, otherElements) =>
         Some(element) -> otherElements
     }
-
 }
 
 object Stack {
@@ -24,26 +24,3 @@ object Stack {
 
   def empty: Stack[Nothing] = Empty
 }
-
-object Main extends App {
-
-  println("-" * 50)
-
-  println {
-    Stack.NonEmpty(
-      1, Stack.NonEmpty(
-        2, Stack.NonEmpty(
-          3, Stack.Empty
-        )
-      )
-    )
-  }
-
-  println(
-    Stack.Empty.push(3).push(2).push(1)
-  )
-
-  println("-" * 50)
-
-}
-
