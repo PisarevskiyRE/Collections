@@ -9,19 +9,64 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-  final override def contains[Super >: Element](input: Super): Boolean =
-    this match {
-      case Empty =>
-        false
+//  final override def containsOriginal[Super >: Element](input: Super): Boolean =
+//    this match {
+//      case Empty =>
+//        false
+//
+//      case NonEmpty(left, element, right) =>
+//        if (input == element)
+//          true
+//        else if (input.hashCode <= element.hashCode)
+//          left.contains(input)
+//        else
+//          right.contains(input)
+//    }
 
-      case NonEmpty(left, element, right) =>
-        if (input == element)
-          true
-        else if (input.hashCode <= element.hashCode)
-          left.contains(input)
-        else
-          right.contains(input)
-    }
+//  final override def contains[Super >: Element](input: Super): Boolean = {
+//
+//    def loop(set: Set[Element]): Boolean =
+//
+//      this match {
+//        case Set.Empty =>
+//          false
+//
+//        case Set.NonEmpty(left, element, right) =>
+//          if (input == element)
+//            true
+//          else if (input.hashCode <= element.hashCode)
+//            loop(left)
+//          else
+//            loop(right)
+//      }
+//
+//    loop(this)
+//  }
+
+  final override def contains[Super >: Element](input: Super): Boolean = {
+
+    def loop(stack: Stack[Set[Element]]): Boolean =
+
+      stack match {
+        case Stack.Empty =>
+          false
+
+        case Stack.NonEmpty(set, otherSetsOnTheStack) => set match {
+          case Set.Empty() =>
+            loop(otherSetsOnTheStack)
+          case Set.NonEmpty(left, element, right)   =>
+            if (input == element)
+              true
+            else if (input.hashCode <= element.hashCode)
+              loop(otherSetsOnTheStack.push(left))
+            else
+              loop(otherSetsOnTheStack.push(right))
+        }
+
+      }
+
+    loop(Stack.empty.push(this))
+  }
 
   final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
     this match {
