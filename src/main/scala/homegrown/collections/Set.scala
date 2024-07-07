@@ -9,77 +9,93 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
   final def apply[Super >: Element](input: Super): Boolean =
     contains(input)
 
-//  final override def containsOriginal[Super >: Element](input: Super): Boolean =
-//    this match {
-//      case Empty =>
-//        false
-//
-//      case NonEmpty(left, element, right) =>
-//        if (input == element)
-//          true
-//        else if (input.hashCode <= element.hashCode)
-//          left.contains(input)
-//        else
-//          right.contains(input)
-//    }
+  final /*override*/ def containsOriginal[Super >: Element](input: Super): Boolean =
+    this match {
+      case Empty =>
+        false // JVM pop
 
-//  final override def contains[Super >: Element](input: Super): Boolean = {
-//
-//    def loop(set: Set[Element]): Boolean =
-//
-//      this match {
-//        case Set.Empty =>
-//          false
-//
-//        case Set.NonEmpty(left, element, right) =>
-//          if (input == element)
-//            true
-//          else if (input.hashCode <= element.hashCode)
-//            loop(left)
-//          else
-//            loop(right)
-//      }
-//
-//    loop(this)
-//  }
+      case NonEmpty(left, element, right) =>
+        if (input == element)
+          true // JVM pop
+        else if (input.hashCode <= element.hashCode)
+          left.contains(input) // JVM (push & pop)
+        else
+          right.contains(input) // JVM (push & pop)
+    }
+
+  final /*override*/ def containsLoop[Super >: Element](input: Super): Boolean = {
+    @scala.annotation.tailrec
+    def loop(set: Set[Element] /*, acc: Boolean*/ ): Boolean =
+      set match {
+        case Set.Empty =>
+          false // JVM pop
+
+        case Set.NonEmpty(left, element, right) =>
+          if (input == element)
+            true // JVM pop
+          else if (input.hashCode <= element.hashCode)
+            loop(left) // JVM (push & pop)
+          else
+            loop(right) // JVM (push & pop)
+      }
+
+    loop(this)
+  }
 
   final override def contains[Super >: Element](input: Super): Boolean = {
+    @scala.annotation.tailrec
+    def loop(stack: Stack[Set[Element]]): Boolean = stack match {
+      case Stack.Empty =>
+        false // JVM pop
 
-    def loop(stack: Stack[Set[Element]]): Boolean =
+      case Stack.NonEmpty(set, otherSetsOnTheStack) => set match {
+        case Set.Empty() =>
+          loop(otherSetsOnTheStack) // pop + JVM (push & pop)
 
-      stack match {
-        case Stack.Empty =>
-          false
-
-        case Stack.NonEmpty(set, otherSetsOnTheStack) => set match {
-          case Set.Empty() =>
-            loop(otherSetsOnTheStack)
-          case Set.NonEmpty(left, element, right)   =>
-            if (input == element)
-              true
-            else if (input.hashCode <= element.hashCode)
-              loop(otherSetsOnTheStack.push(left))
-            else
-              loop(otherSetsOnTheStack.push(right))
-        }
-
+        case Set.NonEmpty(left, element, right) =>
+          if (input == element)
+            true // JVM pop
+          else if (input.hashCode <= element.hashCode)
+            loop(otherSetsOnTheStack.push(left)) // push + JVM (push & pop)
+          else
+            loop(otherSetsOnTheStack.push(right)) // push + JVM (push & pop)
       }
+    }
 
     loop(Stack.empty.push(this))
   }
 
-  final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result =
+  final /*override*/ def foldOriginal[Result](seed: Result)(function: (Result, Element) => Result): Result =
     this match {
       case Empty() =>
-        seed
+        seed // JVM pop
 
       case NonEmpty(left, element, right) =>
         val currentResult = function(seed, element)
-        val rightResult = right.fold(currentResult)(function)
-        left.fold(rightResult)(function)
+
+        val rightResult = right.fold(currentResult)(function) // JVM (push & pop)
+        left.fold(rightResult)(function) // JVM (push & pop)
     }
 
-  final override def add[Super >: Element](input: Super): Set[Super] =
+  final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result = {
+    @scala.annotation.tailrec
+    def loop(stack: Stack[Set[Element]], acc: Result): Result = stack match {
+      case Stack.Empty =>
+        acc // JVM pop
+
+      case Stack.NonEmpty(set, otherSetsOnTheStack) => set match {
+        case Set.Empty() =>
+          loop(otherSetsOnTheStack, acc) // pop + JVM (push & pop)
+
+        case Set.NonEmpty(left, element, right) =>
+          loop(otherSetsOnTheStack.push(right).push(left), function(acc, element)) // push 2x + JVM (push & pop)
+      }
+    }
+
+    loop(Stack.empty.push(this), seed)
+  }
+
+  final /*override*/ def addOriginal[Super >: Element](input: Super): Set[Super] =
     this match {
       case Empty =>
         NonEmpty(empty, input, empty)
@@ -93,7 +109,49 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
           nonEmpty.copy(right = right.add(input))
     }
 
-  final override def remove[Super >: Element](input: Super): Set[Super] =
+  final override def add[Super >: Element](input: Super): Set[Super] = {
+    def path(set: Set[Element]): Path[Element] = {
+      @scala.annotation.tailrec
+      def loop(s: Set[Element], path: Path[Element]): Path[Element] = s match {
+        case Set.Empty() =>
+          path // JVM pop
+
+        case nonEmpty @ Set.NonEmpty(left, element, right) =>
+          if (input == element)
+            path.push(Center(nonEmpty)) // push + JVM (push & pop)
+          else if (input.hashCode <= element.hashCode)
+            loop(left, path.push(Left(nonEmpty))) // push + JVM (push & pop)
+          else
+            loop(right, path.push(Right(nonEmpty))) // push + JVM (push & pop)
+      }
+
+      loop(set, Stack.empty)
+    }
+
+    def rebuild(path: Path[Element]): Set[Super] = {
+      @scala.annotation.tailrec
+      def loop(p: Path[Element], acc: Set[Super]): Set[Super] = p match {
+        case Stack.Empty =>
+          acc // JVM pop
+
+        case Stack.NonEmpty(direction, otherDirectionsOnTheStack) =>
+          loop(
+            p   = otherDirectionsOnTheStack, // pop
+            acc = direction match {
+              case Left(nonEmpty)   => nonEmpty.copy(left = acc) // JVM (push & pop)
+              case Center(nonEmpty) => nonEmpty // JVM pop
+              case Right(nonEmpty)  => nonEmpty.copy(right = acc) // JVM (push & pop)
+            }
+          )
+      }
+
+      loop(path, NonEmpty(empty, input, empty))
+    }
+
+    rebuild(path(this))
+  }
+
+  final /*override*/ def removeOriginal[Super >: Element](input: Super): Set[Super] =
     this match {
       case Empty =>
         empty
@@ -106,6 +164,48 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
         else
           nonEmpty.copy(right = right.remove(input))
     }
+
+  final override def remove[Super >: Element](input: Super): Set[Super] = {
+    def path(set: Set[Element]): Path[Element] = {
+      @scala.annotation.tailrec
+      def loop(s: Set[Element], path: Path[Element]): Path[Element] = s match {
+        case Set.Empty() =>
+          path // JVM pop
+
+        case nonEmpty @ Set.NonEmpty(left, element, right) =>
+          if (input == element)
+            path.push(Center(nonEmpty)) // push + JVM (push & pop)
+          else if (input.hashCode <= element.hashCode)
+            loop(left, path.push(Left(nonEmpty))) // push + JVM (push & pop)
+          else
+            loop(right, path.push(Right(nonEmpty))) // push + JVM (push & pop)
+      }
+
+      loop(set, Stack.empty)
+    }
+
+    def rebuild(path: Path[Element]): Set[Super] = {
+      @scala.annotation.tailrec
+      def loop(p: Path[Element], acc: Set[Super]): Set[Super] = p match {
+        case Stack.Empty =>
+          acc // JVM pop
+
+        case Stack.NonEmpty(direction, otherDirectionsOnTheStack) =>
+          loop(
+            p   = otherDirectionsOnTheStack, // pop
+            acc = direction match {
+              case Left(nonEmpty)                       => nonEmpty.copy(left = acc) // JVM (push & pop)
+              case Center(Set.NonEmpty(left, _, right)) => left.union(right) // JVM pop
+              case Right(nonEmpty)                      => nonEmpty.copy(right = acc) // JVM (push & pop)
+            }
+          )
+      }
+
+      loop(path, empty)
+    }
+
+    rebuild(path(this))
+  }
 
   final def union[Super >: Element](that: Set[Super]): Set[Super] =
     fold(that)(_ add _)
@@ -203,8 +303,8 @@ object Set extends Factory[Set] {
 
   private object Empty extends Set[Nothing] {
     /** case Empty => causes stack overflows in methods like fold
-      * case Empty() => does not
-      */
+     * case Empty() => does not
+     */
     def unapply[Element](set: Set[Element]): Boolean =
       set.isInstanceOf[Empty.type]
 
@@ -219,6 +319,13 @@ object Set extends Factory[Set] {
   }
 
   final override def empty: Set[Nothing] = Empty
+
+  private type Path[Element] = Stack[Direction[Element]]
+
+  private sealed trait Direction[Element] extends Any
+  private final case class Left[Element](nonEmpty: NonEmpty[Element]) extends AnyVal with Direction[Element]
+  private final case class Center[Element](nonEmpty: NonEmpty[Element]) extends AnyVal with Direction[Element]
+  private final case class Right[Element](nonEmpty: NonEmpty[Element]) extends AnyVal with Direction[Element]
 
   implicit def SetCanBeUsedAsFunction1[Element](set: Set[Element]): Element => Boolean =
     set.apply
