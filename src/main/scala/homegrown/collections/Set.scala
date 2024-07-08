@@ -77,6 +77,8 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
         left.fold(rightResult)(function) // JVM (push & pop)
     }
 
+
+
   final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result = {
     @scala.annotation.tailrec
     def loop(stack: Stack[Set[Element]], acc: Result): Result = stack match {
