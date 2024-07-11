@@ -77,8 +77,6 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
         left.fold(rightResult)(function) // JVM (push & pop)
     }
 
-
-
   final override def fold[Result](seed: Result)(function: (Result, Element) => Result): Result = {
     @scala.annotation.tailrec
     def loop(stack: Stack[Set[Element]], acc: Result): Result = stack match {
@@ -305,8 +303,8 @@ object Set extends Factory[Set] {
 
   private object Empty extends Set[Nothing] {
     /** case Empty => causes stack overflows in methods like fold
-     * case Empty() => does not
-     */
+      * case Empty() => does not
+      */
     def unapply[Element](set: Set[Element]): Boolean =
       set.isInstanceOf[Empty.type]
 
