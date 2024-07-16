@@ -19,14 +19,17 @@ scalacOptions ++= Seq(
 
   "-feature",
   "-language:implicitConversions",
-  "-language:higherKinds"
+  "-language:higherKinds",
+  "-P:continuations:enable"
 )
+
 
 libraryDependencies ++=
   Seq(
     "org.scalatest" %%  "scalatest" %  "3.0.5" % "test", // http://www.scalatest.org/
-    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
 //    "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
+    "org.scala-lang.plugins" %% "scala-continuations-library" % "1.0.3"
   )
 
 
@@ -39,3 +42,7 @@ libraryDependencies ++=
 addCommandAlias("testc", ";clean;coverage;test;coverageReport")
 
 //coverageExcludedPackages := "Main"
+
+autoCompilerPlugins := true
+
+addCompilerPlugin("org.scala-lang.plugins" % "scala-continuations-plugin_2.12.2" % "1.0.3")
