@@ -75,7 +75,7 @@ object CPS extends App {
   import scala.util.continuations._
 
   {
-    reset{
+    reset {
       val five = shift(cps[Int, Unit](5))
       val fifteen = five + shift(cps[Int, Unit](10))
       println(fifteen)
@@ -86,16 +86,74 @@ object CPS extends App {
   println("─" * 25)
 
   {
-    reset{
+    reset {
       def shiftCps(input: Int): Int @cpsParam[Unit, Unit] = shift(cps[Int, Unit](input))
-
 
       val five = shiftCps(5)
       val fifteen = five + shiftCps(10)
       println(fifteen)
     }
-
   }
+
+  println("─" * 25)
+
+  {
+    val string = reset {
+      def shiftCps(input: Int): Int @cpsParam[String, String] = shift(cps[Int, String](input))
+
+      val five = shiftCps(5)
+      val fifteen = five + shiftCps(10)
+      fifteen.toString
+    }
+
+    println(string)
+  }
+
+
+  def when[I, E](condition: Boolean)(ifCase: => I)( elseCase:  => E): Any =
+    if (condition)
+      ifCase
+    else
+      elseCase
+
+
+  val x = 5
+  println{
+    if (x>3)
+      "good"
+    else
+      "bad"
+  }
+
+
+  println{
+    when(x>3) {
+      "good"
+    }{ "bad" }
+  }
+
+
+  println("─" * 25)
+
+  def loop[Input](condition: => Boolean)(body: => Unit): Unit = {
+    if(condition) {
+      body
+
+      loop(condition)(body)
+    }
+  }
+
+  var acc = 0
+  while(acc < 100){
+    acc += 1
+  }
+
+  acc = 0
+  loop(acc < 100){
+    acc += 1
+  }
+
+
 
   println("─" * 50)
 }
