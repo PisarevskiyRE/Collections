@@ -1,5 +1,7 @@
 package homegrown.collections
 
+import homegrown.collections.Stack._
+
 object Fibonacci extends App {
   println("─" * 50)
 
@@ -29,6 +31,48 @@ object Fibonacci extends App {
     loop(n, 0, 1)
   }
 
+  def fibonacciTailRec2(n: Long): Long = {
+    @scala.annotation.tailrec
+    def loop(x: Long, acc2: Long, acc1: Long): Long = {
+      if (x == 0)
+        acc1
+      else if (x == 1)
+        acc2
+      else
+        loop(
+          x    = x - 1,
+          acc2 = acc1 + acc2,
+          acc1 = acc2
+        )
+    }
+
+    loop(n, 1, 0)
+  }
+
+  def fibonacciTailRecStackAcc(n: Long): Long = {
+    @scala.annotation.tailrec
+    def loop(x: Long, stack: Stack[Long]): Long = {
+      val Stack.NonEmpty(acc1,
+        Stack.NonEmpty(acc2,
+          restOfTheStack
+          )
+        ) = stack
+
+      if (x == 0)
+        acc1
+      else if (x == 1)
+        acc2
+      else
+        loop(
+          x     = x - 1,
+          stack = restOfTheStack.push(acc1 + acc2).push(acc2)
+
+        )
+    }
+
+    loop(n, Stack.empty.push[Long](1).push(0))
+  }
+
   def fibonacciTailRecStack(n: Long): Long = {
     @scala.annotation.tailrec
     def loop(stack: Stack[Long], acc1: Long, acc2: Long): Long = {
@@ -53,6 +97,8 @@ object Fibonacci extends App {
     Seq(
       fibonacciOriginal,
       fibonacciTailRec,
+      fibonacciTailRec2,
+      fibonacciTailRecStackAcc,
       fibonacciTailRecStack
     )
   //
@@ -63,22 +109,24 @@ object Fibonacci extends App {
     case Seq(head, tail @ _*) => tail.forall(_ == head)
   }
 
+  //0 to 10 map (_.toLong) map fibonacciTailRecStack foreach println
+
   (0 to 10)
     .map { n =>
       n -> fibis.map(f => f(n))
     }.map {
-      case (n, result) =>
+      case (n, results) =>
         val color =
-          if (areAllElementsEqual(result))
+          if (areAllElementsEqual(results))
             Console.GREEN
           else
             Console.RED
 
         val row =
-          (n +: result).mkString("\t")
+          (n +: results).mkString("\t")
 
         color + row + Console.RESET
-    }
+    }.foreach(println)
 
   println("─" * 50)
 }
