@@ -54,7 +54,7 @@ object Fibonacci extends App {
     def loop(x: Long, stack: Stack[Long]): Long = {
       val Stack.NonEmpty(acc1,
         Stack.NonEmpty(acc2,
-          restOfTheStack
+          _
           )
         ) = stack
 
@@ -65,7 +65,7 @@ object Fibonacci extends App {
       else
         loop(
           x     = x - 1,
-          stack = restOfTheStack.push(acc1 + acc2).push(acc2)
+          stack = Stack.empty.push(acc1 + acc2).push(acc2)
 
         )
     }
