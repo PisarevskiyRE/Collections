@@ -59,6 +59,7 @@ object Fibonacci extends App {
       if (x == 0)
         acc1
       else if (x == 1)
+
         acc2
       else
         loop(
