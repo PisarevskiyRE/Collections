@@ -59,7 +59,6 @@ object Fibonacci extends App {
       if (x == 0)
         acc1
       else if (x == 1)
-
         acc2
       else
         loop(
@@ -165,24 +164,24 @@ object Fibonacci extends App {
   println(0 to 9 map isEven mkString "\t")
   println(0 to 9 map isOdd mkString "\t")
 
-  // (0 to 10)
-  //   .map { n =>
-  //     n -> fibis.map(f => f(n))
-  //   }
-  //   .map {
-  //     case (n, results) =>
-  //       val color =
-  //         if (areAllElementsEqual(results))
-  //           Console.GREEN
-  //         else
-  //           Console.RED
+  (0 to 10)
+    .map { n =>
+      n -> fibis.map(f => f(n))
+    }
+    .map {
+      case (n, results) =>
+        val color =
+          if (areAllElementsEqual(results))
+            Console.GREEN
+          else
+            Console.RED
 
-  //       val row =
-  //         (n +: results).mkString("\t")
+        val row =
+          (n +: results).mkString("\t")
 
-  //       color + row + Console.RESET
-  //   }
-  //   .foreach(println)
+        color + row + Console.RESET
+    }
+    .foreach(println)
 
   println("─" * 50)
 }
