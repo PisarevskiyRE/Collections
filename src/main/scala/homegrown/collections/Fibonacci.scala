@@ -119,6 +119,9 @@ object Fibonacci extends App {
       val x: Long = stack.peek.get
 
       if (x == 0)
+
+
+
         acc1
       else if (x == 1)
         acc2
