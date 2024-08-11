@@ -1,5 +1,9 @@
 package homegrown.collections
 
+object WhyMe extends App {
+  Set(0, 1 to 99999: _*)
+}
+
 object Fibonacci extends App {
   println("─" * 50)
 
@@ -119,8 +123,6 @@ object Fibonacci extends App {
       val x: Long = stack.peek.get
 
       if (x == 0)
-
-
 
         acc1
       else if (x == 1)
