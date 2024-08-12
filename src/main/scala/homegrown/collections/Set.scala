@@ -178,15 +178,20 @@ sealed abstract class Set[+Element] extends FoldableFactory[Element, Set] {
 
       val (nonEmpty @ Set.NonEmpty(left, element, right)) = set
       if (input == element)
-        return continuation(nonEmpty)
-      else if (input.hashCode <= element.hashCode) {
-        set = left
-        continuation = acc => continuation(nonEmpty.copy(left = acc))
-      }
-
+        return this
       else {
-        set = right
-        continuation = acc => continuation(nonEmpty.copy(right = acc))
+
+        val closedContinuation = continuation
+
+        if (input.hashCode <= element.hashCode) {
+        set = left
+        continuation = acc => closedContinuation(nonEmpty.copy(left = acc))
+        }
+
+        else {
+          set = right
+          continuation = acc => closedContinuation(nonEmpty.copy(right = acc))
+        }
       }
     }
     continuation(NonEmpty(empty, input, empty))
